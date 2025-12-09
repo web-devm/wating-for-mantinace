@@ -12,17 +12,25 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # ربط ملف الإعداد الخاص بـ Nginx
       - ./nginx:/etc/nginx/conf.d:ro
-      - certs:/etc/nginx/certs
-      - wroot:/www:/var/www/html
-
+      # ربط مجلد شهادات SSL
+      - certs:/etc/letsencrypt
+      # *تصحيح wroot*: ربط وحدة تخزين wroot بمجلد Certbot/Webroot داخل Nginx
+      - wroot:/var/www/certbot
+    
     depends_on:
       - nextjs-app
 
   certbot:
     image: certbot/certbot
     volumes:
-      - certs:/etc/letsencrypt wroot:/www:/var/www/html
+      # *تصحيح wroot*: ربط مجلد الشهادات
+      - certs:/etc/letsencrypt
+      # *تصحيح wroot*: ربط مجلد Webroot الذي سيستخدمه Certbot للتحقق
+      - wroot:/var/www/html
+    
+    # أمر التشغيل (يحصل على الشهادة ويجددها كل 6 ساعات)
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew --webroot -w /var/www/html --quiet; done'
 
 volumes:
