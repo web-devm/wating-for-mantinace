@@ -2,24 +2,28 @@ version: '3.7'
 
 services:
   nextjs-app:
-    # سيقوم ببناء صورتك باستخدام Dockerfile
     build: .
-    # *مهم*: لا يوجد تعيين للمنفذ (ports) هنا؛ التطبيق داخلي فقط.
     restart: always
 
   nginx:
     image: nginx:stable-alpine
     restart: always
     ports:
-      # Nginx سيستمع للمنفذ 80 و 443 على الخادم (VPS)
       - "80:80"
       - "443:443"
     volumes:
-      # ربط مجلد الإعداد الذي سننشئه في الخطوة التالية
       - ./nginx:/etc/nginx/conf.d:ro
-      # مجلدات لحفظ شهادات SSL الخاصة بك (إذا كنت تستخدم certbot)
       - certs:/etc/nginx/certs
-    
-# تعريف وحدات التخزين
+      - ./www:/var/www/html
+    depends_on:
+      - nextjs-app
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certs:/etc/letsencrypt
+      - ./www:/var/www/html
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew --webroot -w /var/www/html --quiet; done'
+
 volumes:
   certs: {}
