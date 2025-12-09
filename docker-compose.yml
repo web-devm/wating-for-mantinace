@@ -2,24 +2,24 @@ version: '3.7'
 
 services:
   nextjs-app:
-    # يخبر Docker Compose أن يقوم بالبناء باستخدام الـ Dockerfile الموجود في نفس المجلد (.).
+    # سيقوم ببناء صورتك باستخدام Dockerfile
     build: .
+    # *مهم*: لا يوجد تعيين للمنفذ (ports) هنا؛ التطبيق داخلي فقط.
     restart: always
-    
-  caddy:
-    image: caddy:2-alpine
+
+  nginx:
+    image: nginx:stable-alpine
     restart: always
     ports:
-      # Caddy يستمع للمنفذ 80 و 443 (HTTP و HTTPS) على الخادم (الـ VPS)
-      - "80:80"   
-      - "443:443" 
+      # Nginx سيستمع للمنفذ 80 و 443 على الخادم (VPS)
+      - "80:80"
+      - "443:443"
     volumes:
-      # ربط ملف إعداد Caddy (الملف المحلي ./Caddyfile) بداخل الحاوية
-      # تذكر: تأكد من أن اسم الملف في GitHub هو Caddyfile (C كبير)
-      - ./Caddyfile:/etc/caddy/Caddyfile 
-      # ربط وحدة التخزين الدائمة لشهادات SSL
-      - caddy_data:/data 
-
-# تعريف وحدات التخزين (Volumes) المستخدمة في الخدمات الأخرى
+      # ربط مجلد الإعداد الذي سننشئه في الخطوة التالية
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      # مجلدات لحفظ شهادات SSL الخاصة بك (إذا كنت تستخدم certbot)
+      - certs:/etc/nginx/certs
+    
+# تعريف وحدات التخزين
 volumes:
-  caddy_data: {}
+  certs: {}
