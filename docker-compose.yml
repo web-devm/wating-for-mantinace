@@ -22,4 +22,5 @@ services:
 
 # تعريف مجلد لحفظ بيانات Caddy (شهادات SSL)
 volumes:
-  caddy_data: {}
+  - ./caddyfile:/etc/caddy/Caddyfile # استخدام caddyfile بدلاً من Caddyfile
+  - caddy_data:/data
