@@ -4,7 +4,6 @@ services:
   nextjs-app:
     # يخبر Docker Compose أن يقوم بالبناء باستخدام الـ Dockerfile الموجود في نفس المجلد (.).
     build: .
-    # *تعديل مهم*: تم إزالة قسم ports لجعله داخليًا فقط.
     restart: always
     
   caddy:
@@ -15,12 +14,12 @@ services:
       - "80:80"   
       - "443:443" 
     volumes:
-      # ربط ملف إعداد Caddy (سنقوم بإنشائه في الخطوة التالية)
+      # ربط ملف إعداد Caddy (الملف المحلي ./Caddyfile) بداخل الحاوية
+      # تذكر: تأكد من أن اسم الملف في GitHub هو Caddyfile (C كبير)
       - ./Caddyfile:/etc/caddy/Caddyfile 
-      # هذا المجلد يحفظ شهادات SSL للحفاظ عليها عند إعادة التشغيل
+      # ربط وحدة التخزين الدائمة لشهادات SSL
       - caddy_data:/data 
 
-# تعريف مجلد لحفظ بيانات Caddy (شهادات SSL)
+# تعريف وحدات التخزين (Volumes) المستخدمة في الخدمات الأخرى
 volumes:
-  - ./caddyfile:/etc/caddy/Caddyfile # استخدام caddyfile بدلاً من Caddyfile
-  - caddy_data:/data
+  caddy_data: {}
