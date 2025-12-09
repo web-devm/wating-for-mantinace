@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   nextjs-app:
+    # سيقوم ببناء صورتك باستخدام Dockerfile
     build: .
     restart: always
 
@@ -9,30 +10,15 @@ services:
     image: nginx:stable-alpine
     restart: always
     ports:
+      # Nginx يستمع للمنفذ 80 (HTTP) فقط
       - "80:80"
-      - "443:443"
+      # تم حذف المنفذ 443
     volumes:
       # ربط ملف الإعداد الخاص بـ Nginx
       - ./nginx:/etc/nginx/conf.d:ro
-      # ربط مجلد شهادات SSL
-      - certs:/etc/letsencrypt
-      # *تصحيح wroot*: ربط وحدة تخزين wroot بمجلد Certbot/Webroot داخل Nginx
-      - wroot:/var/www/certbot
+      # تم حذف ربط certs و wroot
     
     depends_on:
       - nextjs-app
 
-  certbot:
-    image: certbot/certbot
-    volumes:
-      # *تصحيح wroot*: ربط مجلد الشهادات
-      - certs:/etc/letsencrypt
-      # *تصحيح wroot*: ربط مجلد Webroot الذي سيستخدمه Certbot للتحقق
-      - wroot:/var/www/html
-    
-    # أمر التشغيل (يحصل على الشهادة ويجددها كل 6 ساعات)
-    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew --webroot -w /var/www/html --quiet; done'
-
-volumes:
-  certs: {}
-  wroot: {}
+# تم حذف قسم volumes بالكامل (certs و wroot)
