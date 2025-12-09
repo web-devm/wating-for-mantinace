@@ -22,8 +22,9 @@ services:
     image: certbot/certbot
     volumes:
       - certs:/etc/letsencrypt
-      - ./www:/var/www/html
+        wroot:/www:/var/www/html
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew --webroot -w /var/www/html --quiet; done'
 
 volumes:
   certs: {}
+  wroot: {}
