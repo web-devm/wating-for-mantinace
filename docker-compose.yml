@@ -1,13 +1,25 @@
 version: '3.7'
+
 services:
   nextjs-app:
     # يخبر Docker Compose أن يقوم بالبناء باستخدام الـ Dockerfile الموجود في نفس المجلد (.).
     build: .
-    
-    # يربط المنفذ 80 على الخادم (HTTP) بالمنفذ 3000 داخل الحاوية.
-    # تذكر: تطبيق Next.js يعمل على المنفذ 3000 كما هو محدد في Dockerfile.
-    ports:
-      - "80:3000"
-    
-    # يضمن إعادة تشغيل الحاوية في حالة فشلها
+    # *تعديل مهم*: تم إزالة قسم ports لجعله داخليًا فقط.
     restart: always
+    
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      # Caddy يستمع للمنفذ 80 و 443 (HTTP و HTTPS) على الخادم (الـ VPS)
+      - "80:80"   
+      - "443:443" 
+    volumes:
+      # ربط ملف إعداد Caddy (سنقوم بإنشائه في الخطوة التالية)
+      - ./Caddyfile:/etc/caddy/Caddyfile 
+      # هذا المجلد يحفظ شهادات SSL للحفاظ عليها عند إعادة التشغيل
+      - caddy_data:/data 
+
+# تعريف مجلد لحفظ بيانات Caddy (شهادات SSL)
+volumes:
+  caddy_data: {}
