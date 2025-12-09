@@ -16,7 +16,7 @@ services:
       - "443:443"
     volumes:
       # ربط مجلد الإعداد الذي سننشئه في الخطوة التالية
-      - ./nginx:/etc/nginx/conf.d:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       # مجلدات لحفظ شهادات SSL الخاصة بك (إذا كنت تستخدم certbot)
       - certs:/etc/nginx/certs
     
